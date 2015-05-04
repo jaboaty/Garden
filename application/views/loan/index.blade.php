@@ -1,0 +1,1 @@
+This is the C:\xampp\htdocs\garden\application\views/loan/index.blade.php view
