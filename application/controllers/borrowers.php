@@ -4,7 +4,7 @@ class Borrowers_Controller extends Base_Controller {
 
 	public $restful = true;    
 
-	public function get_index()
+	public function get_index() //Displays all Borrowers
     {
 
    		$borrowers = Borrower::all();
@@ -19,21 +19,22 @@ class Borrowers_Controller extends Base_Controller {
 
     }    
 
-	public function put_index()
+	public function put_index() // Adds a New Borrower
     {
     	$input = Input::all();
     	$rules = array(
 		    'borrower_id'  => 'required'
 		);
 		$validation = Validator::make($input, $rules);
-		if ($validation->fails()){
+		if ($validation->fails()){ // Borrower Id not provided.  Display error message
 			$view = View::make('borrower.fail');
 			return $view;
 		}else{
 
-			$borrower = new Borrower;
+			$borrower = new Borrower;  //New borrower database model
             $borrower->kiva_id = Input::get('borrower_id');
 
+            //Grabs Borrower information from Kiva API
 			$url = "http://api.kivaws.org/v1/loans/".$borrower->kiva_id.".json";
 			$json = file_get_contents($url);
 			$data = json_decode($json, TRUE);
@@ -68,7 +69,7 @@ class Borrowers_Controller extends Base_Controller {
 			if( array_key_exists('image', $data) && array_key_exists('id', $data['image']) ){
 				$borrower->image = $data["image"]['id'];
 			}
-			$borrower->save();
+			$borrower->save();  //Saves Model
 
 
 
@@ -88,7 +89,7 @@ class Borrowers_Controller extends Base_Controller {
     }
 
 
-    public function delete_index()
+    public function delete_index() //Restful call to delete a Borrower based off of the borrower ID
     {
     	$input = Input::all();
     	$rules = array(
@@ -96,10 +97,10 @@ class Borrowers_Controller extends Base_Controller {
 		);
 		$id = Input::get('id');
 		$validation = Validator::make($input, $rules);
-		if ($validation->fails()){
+		if ($validation->fails()){  // Validation Fails.  Display Error Message
 			$view = View::make('borrower.fail');
 			return $view;
-		}else{
+		}else{  //Deletes Borrower Record and all Loans given to that borrower
 			$borrower = Borrower::where('id', '=', $id )->first();
 			$borrower->delete();
 
